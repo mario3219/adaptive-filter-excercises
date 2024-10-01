@@ -1,0 +1,16 @@
+clc,clear,close all
+
+function [w,J] = sd(mu,winit,N,R,p,Jmin)
+    w = 0;
+    wcalc(N);
+    J = Jmin + (w-R)
+    function w_next = wcalc(n)
+        if n <= 0
+            w_next = winit;
+        else
+            w_past = w(n-1);
+            w_next = w_past+mu*(p-R*w_past);
+            w = w + w_next;
+        end
+    end
+end
