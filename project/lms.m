@@ -28,7 +28,7 @@ e_track = [];
 %LMS
 for n=M:N
     uvec=u(n:-1:n-M+1);
-    e(n)=d-w'*uvec;  
+    e(n)=d(n)-w'*uvec;  
     w=w+mu*uvec*conj(e(n));
     w_track = [w_track w];
     e_track = [e_track e];
