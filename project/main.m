@@ -19,8 +19,8 @@ plot(data(:,2)), title("Filtered"), xlim([n_start n_stop])
 %%
 
 n_start = 5000;
-M = 20;
-N = 1000;
+M = 25;
+N = 3000;
 
 u = data(n_start:n_start+N,1);
 d = data(n_start:n_start+N,2);
@@ -34,7 +34,7 @@ R_matrix = toeplitz(R(length(u):end));
 
 %calculate stepsize
 Vmax = max(D,[],'all');
-mu = 2/(Vmax);
+mu = 2/(2*Vmax);
 
 %initiate lms
 [e,w,w_track] = lms(mu,M,u,d);
