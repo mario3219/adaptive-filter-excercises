@@ -39,11 +39,10 @@ R_matrix = toeplitz(R(length(u):end));
 
 %calculate stepsize
 Vmax = max(D,[],'all');
-mu = 2/(Vmax);
+mu = 2/Vmax;
 
 %initiate lms
-w=zeros(M,1);
-[e,w,w_track,J] = lms(mu,M,u,d,w);
+[e,w,w_track,J] = lms(mu,M,u,d);
 
 %plot lms performance
 figure

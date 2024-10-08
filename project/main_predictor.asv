@@ -1,0 +1,31 @@
+%% load data
+clc,clear,close all
+
+load("rec_1m.mat");
+data = val';
+
+%%
+
+n_start = 5000;
+M = 10;
+N = 1000;
+
+u1 = data(n_start:n_start+N,1);
+d = data(n_start:n_start+N,2);
+
+sigmav2=0.01;
+u = u1+sqrt(sigmav2)*randn(length(u1),1);
+
+%calculate correlation matrix
+R = xcorr(u, length(u)-1, 'unbiased');
+R_matrix = toeplitz(R(length(u):end));
+
+%calculate eigenvalues
+[V,D] = eig(R_matrix);
+
+%calculate stepsize
+Vmax = max(D,[],'all');
+mu = 2/Vmax;
+
+%initiate lms
+[e,w] = lms_predictor(mu,M,u,d(n));
