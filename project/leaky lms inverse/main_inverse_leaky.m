@@ -1,5 +1,5 @@
 %% load data
-clc,clear,close all
+clc,clear
 
 load("rec_1m.mat");
 data = val';
@@ -43,7 +43,7 @@ mu = 2/Vmax;
 
 %gamma
 % 0 < g < 1/N
-g = (1/N)/2;
+g = 1/N;
 
 %initiate lms
 [e,w,w_track,J] = lms_leaky(mu,M,u,d,g);
@@ -55,13 +55,16 @@ plot(w_track'), xlabel('Iterations'), ylabel('Tap-weights')
 subplot(2,1,2)
 plot(J), title('Learning curve'), xlabel('Iterations'), ylabel('Mean Square Error')
 
-%plot output vs desired
+%test filter
+n_start = 7000;
+u = data(n_start:n_start+N,1);
+d = data(n_start:n_start+N,2);
 output_signal = filter(w, 1, u);
 
 figure
 subplot(3,1,1)
-plot(u), title('Input')
+plot(u), title('Input'), xlabel('Sample'), ylabel("Voltage(mV)"), xlim([1350 1750])
 subplot(3,1,2)
-plot(output_signal), title('Output')
+plot(output_signal), title('Output'), xlabel('Sample'), ylabel("Voltage(mV)"), xlim([1350 1750])
 subplot(3,1,3)
-plot(d), title('Desired signal')
+plot(d), title('Desired signal'), xlabel('Sample'), ylabel("Voltage(mV)"), xlim([1350 1750])

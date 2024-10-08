@@ -25,11 +25,15 @@ R_matrix = toeplitz(R(length(u):end));
 Vmax = max(D,[],'all');
 mu = 2/Vmax;
 
+%gamma
+% 0 < g < 1/N
+g = 1/N;
+
 %initiate lms
-[e,w,w_track,J] = lms_predictor(mu,M,u);
+[e,w,w_track,J] = lms_predictor(mu,M,u,g);
 
 figure
-subplot(2,1,1), plot(w_track), title('W')
+subplot(2,1,1), plot(w_track'), title('W')
 subplot(2,1,2), plot(J), title('Learning curve')
 
 %%

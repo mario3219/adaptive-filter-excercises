@@ -1,67 +1,55 @@
-%% compare data
-
 clc,clear,close all
 
-%data_trim
-data_trim = readtable('Data_trim.csv');
+subplot(3,1,1);
 
-%import data
-data1 = readtable('s01_ex01_s01.csv');
-data2 = readmatrix('s01_ex01_s01.txt');
+% import and plot data
+subplot(3,1,1);
+data = readtable('QDL-BCHAIN.csv');
+data.value = data.value./1e+6;
+plot(data.value)
 
-%trim to match samples in filtered
-data2_trim = data2(9000:33000,2);
-
-%scaling
-%scaling_factor = mean(data1.P4)/mean(data2_trim);
-%data2_trim = scaling_factor * data2_trim;
-%data2_trim = data2_trim - mean(data1.P4);
-
-%filtered data: sample index, four eeg channels
-subplot(2,1,1);
-time_steps = linspace(0, 2*60, height(data1));
-plot(time_steps, data1.P4(:)), title('Filtered')%, xlim([45 46])
-
-%raw data: sample index, four eeg channels
-subplot(2,1,2);
-time_steps = linspace(0, 2*60, height(data2_trim));
-plot(time_steps, data2_trim), title('Raw')%, xlim([45 46])
-
-%set training sample size and FIR order
-M = 30;
+% choose order
+n_start = 5215;
+M = 20;
 N = 2000;
+u = data{n_start:n_start+N, 'value'};
 
-%split into input and desired signal
-u = data2_trim(1:N);
-d = data1.P4(1:N);
-
-%calculate eigenvalues and stepsize
 R = xcorr(u, length(u)-1, 'unbiased');
 R_matrix = toeplitz(R(length(u):end));
+
 [V,D] = eig(R_matrix);
 Vmax = max(D,[],'all');
-%mu = 2/Vmax;
-mu = 2/(Vmax);
+mu = 2/Vmax;
 
-%initiate lms
-[e,w,w_track,J] = lms(mu,M,u,d);
+[e,w,w_track,J] = lms(mu,M,u);
 
-%plot lms performance
+subplot(3,1,2);
+plot(w_track');
+subplot(3,1,3);
+plot(J);
+
+%%
+
+u = data{n_start:n_start+N, 'value'};
+
+nFuture = 1;  % Number of future values to predict
+futurePredictions = zeros(nFuture, 1);
+y = u;
+
+% Use the last known values of the signal to predict future ones
+for i = 1:nFuture
+    % Use the last known input data (from d) as the input vector
+    xVec = y(end:-1:end-M+1);
+    
+    % Predict the next value using the final weights (dot product)
+    futurePredictions(i) = w' * xVec;
+    
+    % Shift the input vector for the next prediction (use the new predicted value)
+    y = [y; futurePredictions(i)];
+end
+
 figure
-subplot(2,1,1);
-plot(w_track'), title('w')
-subplot(2,1,2)
-plot(J), title('J')
-
-%plot output vs desired
-output_signal = filter(w, 1, data2_trim);
-figure, subplot(2,1,1)
-plot(output_signal), title('Output')
-xlim([13600 13800])
-subplot(2,1,2)
-plot(data1.P4), title('Desired signal')
-xlim([13600 13800])
-
-
-
+%plot(y), hold on
+u = data{n_start:n_start+N+nFuture, 'value'};
+plot(u)%, xlim([(height(u)-2*nFuture) height(u)+nFuture])
 

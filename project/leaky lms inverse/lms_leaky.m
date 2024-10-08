@@ -1,4 +1,4 @@
-function [e,w,w_track,J]=lms(mu,M,u);
+function [e,w,w_track,J]=lms(mu,M,u,d,g);
 %           Call:
 %           [e,w]=lms(mu,M,u,d);
 %
@@ -20,16 +20,17 @@ N=length(u);
 
 %make sure that u and d are column vectors
 u=u(:);
+d=d(:);
 
 w_track = [];
 e_track = [];
 
 %LMS
-for n=M:N-1
+for n=M:N
     uvec=u(n:-1:n-M+1);
-    e(n)=u(n+1)-w'*uvec;  
-    w=w+mu*uvec*conj(e(n));
+    e(n)=d(n)-g*w'*w;  
+    w=(1 - g*mu) * w+mu*uvec*conj(e(n));
     w_track = [w_track w];
-    J(n) = mean(e(1:n).^2);
+    J(n) = mean(e(1:n).^2)+g*w'*w;
 end
 e=e(:);
