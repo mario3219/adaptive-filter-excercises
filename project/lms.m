@@ -1,4 +1,4 @@
-function [e,w,w_track,e_track]=lms(mu,M,u,d);
+function [e,w,w_track,J]=lms(mu,M,u,d,w);
 %           Call:
 %           [e,w]=lms(mu,M,u,d);
 %
@@ -13,7 +13,7 @@ function [e,w,w_track,e_track]=lms(mu,M,u,d);
 %           w       = final filter coefficients, dim Mx1
 
 %initial weights
-w=zeros(M,1);
+%w=zeros(M,1);
 
 %length of input signal
 N=length(u);
@@ -31,5 +31,6 @@ for n=M:N
     e(n)=d(n)-w'*uvec;  
     w=w+mu*uvec*conj(e(n));
     w_track = [w_track w];
+    J(n) = mean(e(1:n).^2);
 end
 e=e(:);

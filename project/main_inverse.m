@@ -19,11 +19,16 @@ plot(data(:,2)), title("Filtered"), xlim([n_start n_stop])
 %%
 
 n_start = 5000;
-M = 10;
-N = 100;
+M = 30;
+N = 3000;
+delay = 10;
 
-u = data(n_start:n_start+N,1);
+u1 = data(n_start:n_start+N,1);
 d = data(n_start:n_start+N,2);
+d=[zeros(delay,1);d];
+
+sigmav2=0.01;
+u = u1+sqrt(sigmav2)*randn(length(u1),1);
 
 %calculate correlation matrix
 R = xcorr(u, length(u)-1, 'unbiased');
@@ -37,20 +42,23 @@ Vmax = max(D,[],'all');
 mu = 2/(Vmax);
 
 %initiate lms
-[e,w,w_track] = lms(mu,M,u,d);
+w=zeros(M,1);
+[e,w,w_track,J] = lms(mu,M,u,d,w);
 
 %plot lms performance
 figure
 subplot(2,1,1);
 plot(w_track), title('w')
 subplot(2,1,2)
-plot(e), title('e')
+plot(J), title('J')
 
 %plot output vs desired
 output_signal = filter(w, 1, u);
 
 figure
 subplot(3,1,1)
-plot(output_signal), title('Output')
+plot(u), title('Input')
 subplot(3,1,2)
+plot(output_signal), title('Output')
+subplot(3,1,3)
 plot(d), title('Desired signal')
