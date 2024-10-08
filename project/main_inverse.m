@@ -1,5 +1,5 @@
 %% load data
-clc,clear,close all
+clc,clear
 
 load("rec_1m.mat");
 data = val';
@@ -47,7 +47,7 @@ mu = 2/Vmax;
 %plot lms performance
 figure
 subplot(2,1,1);
-plot(w_track), xlabel('Iterations'), ylabel('Tap-weights')
+plot(w_track'), xlabel('Iterations'), ylabel('Tap-weights')
 subplot(2,1,2)
 plot(J), title('Learning curve'), xlabel('Iterations'), ylabel('Mean Square Error')
 

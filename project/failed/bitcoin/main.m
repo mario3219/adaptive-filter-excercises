@@ -44,14 +44,14 @@ Vmax = max(D,[],'all');
 mu = 2/(Vmax);
 
 %initiate lms
-[e,w,w_track] = lms(mu,M,u,d);
+[e,w,w_track,J] = lms(mu,M,u,d);
 
 %plot lms performance
 figure
 subplot(2,1,1);
-plot(w_track), title('w')
+plot(w_track'), title('w')
 subplot(2,1,2)
-plot(e), title('e')
+plot(J), title('J')
 
 %plot output vs desired
 output_signal = filter(w, 1, data2_trim);

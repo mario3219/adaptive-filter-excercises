@@ -12,18 +12,23 @@ n_stop = 6000;
 
 figure
 subplot(2,1,1)
-plot(data(:,1)), title("Raw"), xlim([n_start n_stop])
+plot(data(:,1)), title("Raw data"), xlim([n_start n_stop])
 subplot(2,1,2)
-plot(data(:,2)), title("Filtered"), xlim([n_start n_stop])
+plot(data(:,2)), title("Filtered data"), xlim([n_start n_stop])
 
 %%
 
 n_start = 5000;
-M = 25;
+M = 30;
 N = 3000;
+delay = 10;
 
 u = data(n_start:n_start+N,1);
 d = data(n_start:n_start+N,2);
+d=[zeros(delay,1);d];
+
+sigmav2=0.01;
+u = u+sqrt(sigmav2)*randn(length(u),1);
 
 %calculate correlation matrix
 R = xcorr(u, length(u)-1, 'unbiased');
@@ -34,25 +39,29 @@ R_matrix = toeplitz(R(length(u):end));
 
 %calculate stepsize
 Vmax = max(D,[],'all');
-mu = 2/(2*Vmax);
+mu = 2/Vmax;
+
+%gamma
+% 0 < g < 1/N
+g = (1/N)/2;
 
 %initiate lms
-[e,w,w_track] = lms(mu,M,u,d);
+[e,w,w_track,J] = lms_leaky(mu,M,u,d,g);
 
 %plot lms performance
 figure
 subplot(2,1,1);
-plot(w_track), title('w')
+plot(w_track'), xlabel('Iterations'), ylabel('Tap-weights')
 subplot(2,1,2)
-plot(e), title('e')
+plot(J), title('Learning curve'), xlabel('Iterations'), ylabel('Mean Square Error')
 
 %plot output vs desired
-output_signal = filter(w, 1, data(:,1));
+output_signal = filter(w, 1, u);
 
 figure
 subplot(3,1,1)
-plot(data(:,1)), title('Input')
+plot(u), title('Input')
 subplot(3,1,2)
 plot(output_signal), title('Output')
 subplot(3,1,3)
-plot(data(:,2)), title('Desired signal')
+plot(d), title('Desired signal')
